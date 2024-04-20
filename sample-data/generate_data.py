@@ -34,6 +34,7 @@ def generate_taxpayer_data(num_taxpayers):
             "average_reply_time" : fake.random_int(1, 3600),
         }
         taxpayers.append(taxpayer)
+    return taxpayers
 
 # Writing to taxpayers.json
 def read_taxpayers_file():
@@ -48,3 +49,22 @@ if __name__ == "__main__":
     taxpayers_data = read_taxpayers_file()
     if taxpayers_data:
         print("Successfully loaded taxpayers data.")
+
+#   Function to calculate taxpayer scores
+def calculate_scores(taxpayers, fixat_office_location):
+    for taxpayer in taxpayers:
+        #   Calculate distance between taxpayer and Fixat's office location
+        taxpayer_location = (taxpayer["location"]["latitude"],  taxpayer["location"]["longitude"])
+        distance_to_fixat = geodesic(fixat_office_location, taxpayer_location).kilometers
+        taxpayer["distance_to_office"] = distance_to_fixat
+        #   Calculate score for each taxpayer
+        age_score = taxpayer["age"] / 90 * 10
+        distance_score = (1 - taxpayer["distance_to_office"] / 100) * 10
+        accepted_offers_score = taxpayer["accepted_offers"] / 100 * 30
+        canceled_offers_score = (1 - taxpayer["canceled_offers"] / 100) * 30
+        reply_time_score = (1 - taxpayer["average_reply_time"] / 3600 / 24) * 20
+        
+        total_score = (age_score + distance_score) * 0.2 + (accepted_offers_score + canceled_offers_score + reply_time_score) * 0.8
+        taxpayer["score"] = total_score
+    return taxpayers
+
