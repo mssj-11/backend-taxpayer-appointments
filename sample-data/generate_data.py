@@ -54,7 +54,7 @@ if __name__ == "__main__":
 def calculate_scores(taxpayers, fixat_office_location):
     for taxpayer in taxpayers:
         #   Calculate distance between taxpayer and Fixat's office location
-        taxpayer_location = (taxpayer["location"]["latitude"],  taxpayer["location"]["longitude"])
+        taxpayer_location = (taxpayer["location"]["latitude"], taxpayer["location"]["longitude"])
         distance_to_fixat = geodesic(fixat_office_location, taxpayer_location).kilometers
         taxpayer["distance_to_office"] = distance_to_fixat
         #   Calculate score for each taxpayer
@@ -68,3 +68,22 @@ def calculate_scores(taxpayers, fixat_office_location):
         taxpayer["score"] = total_score
     return taxpayers
 
+#   Function to select top 10 taxpayers
+def select_top_taxpayers(taxpayers):
+    sorted_taxpayers = sorted(taxpayers, key=lambda x: x["score"], reverse=True)
+    return sorted_taxpayers[:10]
+
+if __name__ == "__main__":
+    # Request the latitude and length to the user
+    latitude = float(input("Latitude: "))
+    longitude = float(input("Longitude: "))
+    
+    fixat_office_location = (latitude, longitude)
+    # Read data from taxpayers taxpayers.json
+    taxpayers_data = read_taxpayers_file()
+    # Calculate taxpayers scores
+    taxpayers_with_scores = calculate_scores(taxpayers_data, fixat_office_location)
+    # Select the 10 best taxpayers
+    top_10_taxpayers = select_top_taxpayers(taxpayers_with_scores)
+    # Show the console result in JSON format
+    print(json.dumps(top_10_taxpayers, indent=4))
