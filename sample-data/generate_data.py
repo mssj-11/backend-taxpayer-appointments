@@ -56,7 +56,7 @@ def calculate_scores(taxpayers, fixat_office_location):
         #   Calculate distance between taxpayer and Fixat's office location
         taxpayer_location = (taxpayer["location"]["latitude"], taxpayer["location"]["longitude"])
         distance_to_fixat = geodesic(fixat_office_location, taxpayer_location).kilometers
-        taxpayer["distance_to_office"] = distance_to_fixat
+        taxpayer["distance_to_office"] = int(round(distance_to_fixat))
         #   Calculate score for each taxpayer
         age_score = taxpayer["age"] / 90 * 10
         distance_score = (1 - taxpayer["distance_to_office"] / 100) * 10
@@ -65,7 +65,7 @@ def calculate_scores(taxpayers, fixat_office_location):
         reply_time_score = (1 - taxpayer["average_reply_time"] / 3600 / 24) * 20
         
         total_score = (age_score + distance_score) * 0.2 + (accepted_offers_score + canceled_offers_score + reply_time_score) * 0.8
-        taxpayer["score"] = total_score
+        taxpayer["score"] = int(round(total_score))
     return taxpayers
 
 #   Function to select top 10 taxpayers
